@@ -7,7 +7,7 @@ import { AuthRequest } from "../middleware/authMiddleware";
  */
 export const createVisa = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const {
@@ -76,22 +76,141 @@ export const createVisa = async (
 };
 
 /**
- * Get All Visas
+ * Get All Visa
+ * Supports:
+ * search
+ * paymentStatus
+ * visaCategory
+ * source
+ * page
+ * limit
+ * sort
  */
 export const getAllVisa = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const visas = await Visa.find({
+    const {
+      search,
+      paymentStatus,
+      visaCategory,
+      source,
+
+      // Date Filters
+      receiveFrom,
+      receiveTo,
+
+      expiryFrom,
+      expiryTo,
+
+      deliveryFrom,
+      deliveryTo,
+
+      page = "1",
+      limit = "10",
+      sort = "-createdAt",
+    } = req.query;
+
+    const filter: any = {
       isDeleted: false,
-    })
+    };
+
+    // ================= SEARCH =================
+
+    if (search) {
+      filter.$or = [
+        {
+          foreignerName: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+        {
+          passportNo: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+      ];
+    }
+
+    // ================= FILTERS =================
+
+    if (paymentStatus) {
+      filter.paymentStatus = paymentStatus;
+    }
+
+    if (visaCategory) {
+      filter.visaCategory = visaCategory;
+    }
+
+    if (source) {
+      filter.source = source;
+    }
+
+    // ================= RECEIVE DATE =================
+
+    if (receiveFrom || receiveTo) {
+      filter.receiveDate = {};
+
+      if (receiveFrom) {
+        filter.receiveDate.$gte = new Date(receiveFrom as string);
+      }
+
+      if (receiveTo) {
+        filter.receiveDate.$lte = new Date(receiveTo as string);
+      }
+    }
+
+    // ================= EXPIRY DATE =================
+
+    if (expiryFrom || expiryTo) {
+      filter.visaExpiryDate = {};
+
+      if (expiryFrom) {
+        filter.visaExpiryDate.$gte = new Date(expiryFrom as string);
+      }
+
+      if (expiryTo) {
+        filter.visaExpiryDate.$lte = new Date(expiryTo as string);
+      }
+    }
+
+    // ================= DELIVERY DATE =================
+
+    if (deliveryFrom || deliveryTo) {
+      filter.deliveryDate = {};
+
+      if (deliveryFrom) {
+        filter.deliveryDate.$gte = new Date(deliveryFrom as string);
+      }
+
+      if (deliveryTo) {
+        filter.deliveryDate.$lte = new Date(deliveryTo as string);
+      }
+    }
+
+    // ================= PAGINATION =================
+
+    const currentPage = Number(page);
+    const perPage = Number(limit);
+
+    const visas = await Visa.find(filter)
       .populate("createdBy", "name email")
-      .sort({ createdAt: -1 });
+      .populate("updatedBy", "name email")
+      .sort(sort as string)
+      .skip((currentPage - 1) * perPage)
+      .limit(perPage);
+
+    const total = await Visa.countDocuments(filter);
 
     res.status(200).json({
       success: true,
-      count: visas.length,
+      total,
+      page: currentPage,
+      limit: perPage,
+      totalPages: Math.ceil(total / perPage),
       data: visas,
     });
   } catch (error) {
@@ -109,11 +228,12 @@ export const getAllVisa = async (
  */
 export const getVisaById = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const visa = await Visa.findById(req.params.id)
-      .populate("createdBy", "name email");
+      .populate("createdBy", "name email")
+      .populate("updatedBy", "name email");
 
     if (!visa || visa.isDeleted) {
       res.status(404).json({
@@ -155,7 +275,50 @@ export const updateVisa = async (
       return;
     }
 
-    Object.assign(visa, req.body);
+    const {
+      foreignerName,
+      passportNo,
+      source,
+      visaCategory,
+      duration,
+      receiveDate,
+      visaExpiryDate,
+      fileSubmitDate,
+      deliveryDate,
+      paymentStatus,
+      remark,
+    } = req.body;
+
+    // ================= NEW =================
+    // Prevent duplicate passport numbers
+    if (passportNo !== undefined) {
+      const existingVisa = await Visa.findOne({
+        passportNo,
+        _id: { $ne: visa._id }, // Ignore current record
+        isDeleted: false,
+      });
+
+      if (existingVisa) {
+        res.status(400).json({
+          success: false,
+          message: "Passport number already exists.",
+        });
+        return;
+      }
+    }
+    // ================= END NEW =================
+
+    if (foreignerName !== undefined) visa.foreignerName = foreignerName;
+    if (passportNo !== undefined) visa.passportNo = passportNo;
+    if (source !== undefined) visa.source = source;
+    if (visaCategory !== undefined) visa.visaCategory = visaCategory;
+    if (duration !== undefined) visa.duration = duration;
+    if (receiveDate !== undefined) visa.receiveDate = receiveDate;
+    if (visaExpiryDate !== undefined) visa.visaExpiryDate = visaExpiryDate;
+    if (fileSubmitDate !== undefined) visa.fileSubmitDate = fileSubmitDate;
+    if (deliveryDate !== undefined) visa.deliveryDate = deliveryDate;
+    if (paymentStatus !== undefined) visa.paymentStatus = paymentStatus;
+    if (remark !== undefined) visa.remark = remark;
 
     visa.updatedBy = req.user.id;
 
@@ -181,7 +344,7 @@ export const updateVisa = async (
  */
 export const deleteVisa = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const visa = await Visa.findById(req.params.id);
@@ -202,49 +365,6 @@ export const deleteVisa = async (
     res.status(200).json({
       success: true,
       message: "Visa deleted successfully.",
-    });
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-    });
-  }
-};
-
-/**
- * Search Visa
- */
-export const searchVisa = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
-    const keyword = req.query.q as string;
-
-    const visas = await Visa.find({
-      isDeleted: false,
-      $or: [
-        {
-          passportNo: {
-            $regex: keyword,
-            $options: "i",
-          },
-        },
-        {
-          foreignerName: {
-            $regex: keyword,
-            $options: "i",
-          },
-        },
-      ],
-    });
-
-    res.status(200).json({
-      success: true,
-      count: visas.length,
-      data: visas,
     });
   } catch (error) {
     console.error(error);
