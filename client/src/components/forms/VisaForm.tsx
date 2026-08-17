@@ -14,7 +14,7 @@ export interface VisaFormData {
   visaExpiryDate: string;
   fileSubmitDate: string;
   deliveryDate: string;
-  paymentStatus: "Paid" | "UnPaid";
+  paymentStatus: "Paid" | "Pending";
   remark: string;
 }
 
@@ -151,8 +151,8 @@ const VisaForm = ({
               Paid
             </option>
 
-            <option value="UnPaid">
-              UnPaid
+            <option value="Pending">
+              Pending
             </option>
           </select>
         </div>

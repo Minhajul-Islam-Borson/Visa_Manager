@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Visa from "../models/Visa";
 import { AuthRequest } from "../middleware/authMiddleware";
+import { addVisaToSheet } from "../services/googleSheetService";
 
 /**
  * Create Visa
@@ -59,6 +60,23 @@ export const createVisa = async (
       remark,
       createdBy: req.user.id,
     });
+    try {
+      await addVisaToSheet({
+        foreignerName,
+        passportNo,
+        source,
+        visaCategory,
+        duration,
+        receiveDate,
+        visaExpiryDate,
+        fileSubmitDate,
+        deliveryDate,
+        paymentStatus,
+        remark,
+      });
+    } catch (error) {
+      console.error("Error adding visa to Google Sheet:", error);
+    }
 
     res.status(201).json({
       success: true,
@@ -88,7 +106,7 @@ export const createVisa = async (
  */
 export const getAllVisa = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const {
@@ -262,7 +280,7 @@ export const getVisaById = async (
  */
 export const updateVisa = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const visa = await Visa.findById(req.params.id);

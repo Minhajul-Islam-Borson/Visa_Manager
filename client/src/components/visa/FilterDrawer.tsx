@@ -74,7 +74,7 @@ const FilterDrawer = ({
           >
             <option value="">All Payment</option>
             <option value="Paid">Paid</option>
-            <option value="UnPaid">UnPaid</option>
+            <option value="Pending">Pending</option>
           </select>
 
           <input

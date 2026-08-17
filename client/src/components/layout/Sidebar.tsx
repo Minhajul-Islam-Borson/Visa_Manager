@@ -4,49 +4,43 @@ import {
   PlusCircle,
   BarChart3,
   Users,
-  Settings,
   LogOut,
   ShieldCheck,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
-const menus = [
+const menus: {
+  title: string;
+  icon: any;
+  path: string;
+  end?: boolean;
+}[] = [
   {
     title: "Dashboard",
     icon: LayoutDashboard,
     path: "/dashboard",
-    exact: true,
   },
   {
     title: "Visa List",
     icon: FileText,
     path: "/visa",
-    exact: true,
+    end: true,
   },
   {
     title: "Add Visa",
     icon: PlusCircle,
     path: "/visa/add",
-    exact: true,
   },
   {
     title: "Reports",
     icon: BarChart3,
     path: "/reports",
-    exact: true,
   },
   {
-    title: "Users",
+    title: "Profile",
     icon: Users,
-    path: "/users",
-    exact: true,
-  },
-  {
-    title: "Settings",
-    icon: Settings,
-    path: "/settings",
-    exact: true,
+    path: "/profile",
   },
 ];
 
@@ -77,7 +71,6 @@ const Sidebar = () => {
 
       {/* Menu */}
       <nav className="flex-1 p-5 space-y-2">
-
         {menus.map((item) => {
           const Icon = item.icon;
 
@@ -85,7 +78,7 @@ const Sidebar = () => {
             <NavLink
               key={item.title}
               to={item.path}
-              end={item.exact}
+              end={item.end}
               className={({ isActive }) =>
                 `flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 ${
                   isActive
@@ -102,12 +95,10 @@ const Sidebar = () => {
             </NavLink>
           );
         })}
-
       </nav>
 
       {/* User */}
       <div className="border-t border-white/20 p-5">
-
         <div className="mb-4">
           <h4 className="font-semibold">
             {user?.name}
@@ -125,7 +116,6 @@ const Sidebar = () => {
           <LogOut size={20} />
           Logout
         </button>
-
       </div>
 
     </aside>

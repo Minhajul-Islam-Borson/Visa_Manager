@@ -4,6 +4,7 @@ import type {
   Visa,
   VisaQuery,
 } from "../types/visa";
+import type { VisaFormData } from "@/components/forms/VisaForm";
 
 export const getAllVisa = (
   params?: VisaQuery
@@ -20,14 +21,14 @@ export const getVisaById = (
 };
 
 export const createVisa = (
-  data: Visa
+  data: VisaFormData
 ) => {
   return api.post("/visa", data);
 };
 
 export const updateVisa = (
   id: string,
-  data: Partial<Visa>
+  data: Partial<VisaFormData>
 ) => {
   return api.put(`/visa/${id}`, data);
 };

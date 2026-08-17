@@ -1,23 +1,20 @@
 import { Router } from "express";
 import { verifyToken } from "../middleware/authMiddleware";
 
-import {
-  getDashboardSummary,
-  exportExcel,
-} from "../controllers/dashboard.controller";
+import { getSummary, getMonthlyReport } from "../controllers/report.controller";
 
 const router = Router();
 
 router.get(
-  "/",
+  "/summary",
   verifyToken,
-  getDashboardSummary
+  getSummary
 );
 
 router.get(
-  "/export",
+  "/monthly",
   verifyToken,
-  exportExcel
+  getMonthlyReport
 );
 
 export default router;
