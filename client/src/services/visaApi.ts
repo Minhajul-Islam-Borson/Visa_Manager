@@ -1,7 +1,6 @@
 import api from "./axios";
 
 import type {
-  Visa,
   VisaQuery,
 } from "../types/visa";
 import type { VisaFormData } from "@/components/forms/VisaForm";
