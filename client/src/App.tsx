@@ -16,7 +16,16 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Public Route */}
-        <Route path="/" element={<Login />} />
+        <Route
+          path="/"
+          element={
+            localStorage.getItem("token") ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Login />
+            )
+          }
+        />
 
         {/* Protected Routes */}
         <Route
@@ -40,7 +49,7 @@ function App() {
 
           {/* Reports */}
           <Route path="/reports" element={<Reports />} />
-          
+
           {/* Profile */}
           <Route path="/profile" element={<Profile />} />
 
