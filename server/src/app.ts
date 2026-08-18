@@ -8,7 +8,12 @@ import reportRoutes from "./routes/report.routes";
 
 const app = express();
 //middlewares
-app.use(cors());
+app.use(
+  cors({
+    origin: ["https://visa-manager-eight.vercel.app"],
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use(errorHandler);
 
