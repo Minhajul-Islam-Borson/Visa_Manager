@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://visa-manager-server.onrender.com",
+  baseURL: "https://visa-manager-server.onrender.com/api",
   withCredentials: false,
 });
 
