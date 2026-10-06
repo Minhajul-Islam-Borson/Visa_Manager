@@ -6,12 +6,13 @@ export interface IVisa extends Document {
   source: string;
   visaCategory: string;
   duration: string;
+  workStatus: string;
   receiveDate: Date;
   visaExpiryDate: Date;
-  fileSubmitDate: Date;
-  deliveryDate: Date;
-  paymentStatus: "Paid" | "Pending";
-  remark: string;
+  fileSubmitDate: Date | null;
+  deliveryDate: Date | null;
+  paymentStatus: "Paid" | "Pending" | null;
+  remark: string | null;
   createdBy: mongoose.Types.ObjectId;
   updatedBy?: mongoose.Types.ObjectId;
   isDeleted: boolean;
@@ -34,36 +35,57 @@ const visaSchema = new Schema<IVisa>(
 
     source: {
       type: String,
-      default: "",
+      required: true,
+      trim: true,
     },
 
     visaCategory: {
       type: String,
-      default: "",
+      required: true,
+      trim: true,
     },
 
     duration: {
       type: String,
-      default: "",
+      required: true,
+      trim: true,
     },
 
-    receiveDate: Date,
+    workStatus: {
+      type: String,
+      required: true,
+      trim: true,
+    },
 
-    visaExpiryDate: Date,
+    receiveDate: {
+      type: Date,
+      required: true,
+    },
 
-    fileSubmitDate: Date,
+    visaExpiryDate: {
+      type: Date,
+      required: true,
+    },
 
-    deliveryDate: Date,
+    fileSubmitDate: {
+      type: Date,
+      default: null,
+    },
+
+    deliveryDate: {
+      type: Date,
+      default: null,
+    },
 
     paymentStatus: {
       type: String,
       enum: ["Paid", "Pending"],
-      default: "Pending",
+      default: null,
     },
 
     remark: {
       type: String,
-      default: "",
+      default: null,
     },
 
     createdBy: {
@@ -84,7 +106,7 @@ const visaSchema = new Schema<IVisa>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 export default mongoose.model<IVisa>("Visa", visaSchema);

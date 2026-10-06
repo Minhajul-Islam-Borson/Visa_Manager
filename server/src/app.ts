@@ -10,10 +10,14 @@ const app = express();
 //middlewares
 app.use(
   cors({
-    origin: ["https://visa-manager-eight.vercel.app"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "https://visa-manager-eight.vercel.app"],
     credentials: true,
   }),
 );
+
 app.use(express.json());
 app.use(errorHandler);
 

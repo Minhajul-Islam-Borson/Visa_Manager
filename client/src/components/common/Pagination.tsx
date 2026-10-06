@@ -1,7 +1,4 @@
-import {
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Props {
   currentPage: number;
@@ -9,11 +6,7 @@ interface Props {
   onPageChange: (page: number) => void;
 }
 
-const Pagination = ({
-  currentPage,
-  totalPages,
-  onPageChange,
-}: Props) => {
+const Pagination = ({ currentPage, totalPages, onPageChange }: Props) => {
   if (totalPages <= 1) return null;
 
   const pages = [];
@@ -23,13 +16,10 @@ const Pagination = ({
   }
 
   return (
-    <div className="flex items-center justify-end gap-2 mt-6">
-
+    <div className="mt-6 flex flex-wrap items-center justify-center gap-2 sm:justify-end">
       <button
         disabled={currentPage === 1}
-        onClick={() =>
-          onPageChange(currentPage - 1)
-        }
+        onClick={() => onPageChange(currentPage - 1)}
         className="w-10 h-10 rounded-lg border flex items-center justify-center disabled:opacity-40"
       >
         <ChevronLeft size={18} />
@@ -51,14 +41,11 @@ const Pagination = ({
 
       <button
         disabled={currentPage === totalPages}
-        onClick={() =>
-          onPageChange(currentPage + 1)
-        }
+        onClick={() => onPageChange(currentPage + 1)}
         className="w-10 h-10 rounded-lg border flex items-center justify-center disabled:opacity-40"
       >
         <ChevronRight size={18} />
       </button>
-
     </div>
   );
 };

@@ -12,20 +12,21 @@ export const createVisaValidation = [
     .notEmpty()
     .withMessage("Passport Number is required"),
 
-  body("source")
-    .trim()
-    .notEmpty()
-    .withMessage("Source is required"),
+  body("source").trim().notEmpty().withMessage("Source is required"),
 
   body("visaCategory")
     .trim()
     .notEmpty()
     .withMessage("Visa Category is required"),
 
-  body("duration")
+  body("duration").trim().notEmpty().withMessage("Duration is required"),
+
+  body("workStatus")
+    .isString()
+    .withMessage("Work Status must be text")
     .trim()
     .notEmpty()
-    .withMessage("Duration is required"),
+    .withMessage("Work Status is required"),
 
   body("receiveDate")
     .notEmpty()
@@ -40,23 +41,22 @@ export const createVisaValidation = [
     .withMessage("Invalid Visa Expiry Date"),
 
   body("fileSubmitDate")
-    .optional()
+    .optional({ values: "falsy" })
     .isISO8601()
     .withMessage("Invalid File Submit Date"),
 
   body("deliveryDate")
-    .optional()
+    .optional({ values: "falsy" })
     .isISO8601()
     .withMessage("Invalid Delivery Date"),
 
   body("paymentStatus")
-    .notEmpty()
-    .withMessage("Payment Status is required")
-    .isIn(["Paid", "Pending", "Unpaid"])
-    .withMessage("Payment Status must be Paid, Pending or Unpaid"),
+    .optional({ values: "falsy" })
+    .isIn(["Paid", "Pending"])
+    .withMessage("Payment Status must be Paid or Pending"),
 
   body("remark")
-    .optional()
+    .optional({ values: "falsy" })
     .isString()
     .withMessage("Remark must be a string"),
 
@@ -64,15 +64,39 @@ export const createVisaValidation = [
 ];
 
 export const updateVisaValidation = [
-  body("foreignerName").optional().trim(),
+  body("foreignerName")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage("Foreigner Name is required"),
 
-  body("passportNo").optional().trim(),
+  body("passportNo")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage("Passport Number is required"),
 
-  body("source").optional().trim(),
+  body("source").optional().trim().notEmpty().withMessage("Source is required"),
 
-  body("visaCategory").optional().trim(),
+  body("visaCategory")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage("Visa Category is required"),
 
-  body("duration").optional().trim(),
+  body("duration")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage("Duration is required"),
+
+  body("workStatus")
+    .optional()
+    .isString()
+    .withMessage("Work Status must be text")
+    .trim()
+    .notEmpty()
+    .withMessage("Work Status is required"),
 
   body("receiveDate")
     .optional()
@@ -85,22 +109,22 @@ export const updateVisaValidation = [
     .withMessage("Invalid Visa Expiry Date"),
 
   body("fileSubmitDate")
-    .optional()
+    .optional({ values: "falsy" })
     .isISO8601()
     .withMessage("Invalid File Submit Date"),
 
   body("deliveryDate")
-    .optional()
+    .optional({ values: "falsy" })
     .isISO8601()
     .withMessage("Invalid Delivery Date"),
 
   body("paymentStatus")
-    .optional()
-    .isIn(["Paid", "Pending", "Unpaid"])
-    .withMessage("Payment Status must be Paid, Pending or Unpaid"),
+    .optional({ values: "falsy" })
+    .isIn(["Paid", "Pending"])
+    .withMessage("Payment Status must be Paid or Pending"),
 
   body("remark")
-    .optional()
+    .optional({ values: "falsy" })
     .isString()
     .withMessage("Remark must be a string"),
 
@@ -110,7 +134,7 @@ export const updateVisaValidation = [
 function validateRequest(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): void {
   const errors = validationResult(req);
 

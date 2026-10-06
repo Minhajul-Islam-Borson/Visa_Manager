@@ -93,16 +93,16 @@ const VisaList = () => {
     <div className="space-y-6">
       {/* Header */}
 
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col items-stretch justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold">Visa List</h1>
+          <h1 className="text-2xl font-bold sm:text-3xl">Visa List</h1>
 
           <p className="text-gray-500">Manage all visa records</p>
         </div>
 
         <button
           onClick={() => navigate("/visa/add")}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg transition"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-white transition hover:bg-blue-700 sm:w-auto"
         >
           <Plus size={18} />
           Add Visa
@@ -111,11 +111,11 @@ const VisaList = () => {
 
       {/* Search + Filter */}
 
-      <div className="bg-white rounded-xl shadow p-5">
-        <div className="flex items-center gap-3">
+      <div className="rounded-xl bg-white p-4 shadow sm:p-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           {/* Search Box */}
 
-          <div className="relative w-[380px]">
+          <div className="relative w-full sm:w-[380px]">
             <Search size={18} className="absolute left-3 top-3 text-gray-400" />
 
             <input
@@ -136,7 +136,7 @@ const VisaList = () => {
 
           <button
             onClick={handleSearch}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg transition"
+            className="w-full rounded-lg bg-blue-600 px-5 py-2 text-white transition hover:bg-blue-700 sm:w-auto"
           >
             Search
           </button>
@@ -145,7 +145,7 @@ const VisaList = () => {
 
           <button
             onClick={() => setShowFilter(true)}
-            className="flex items-center gap-2 border border-gray-300 hover:bg-gray-100 px-5 py-2 rounded-lg transition"
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 px-5 py-2 transition hover:bg-gray-100 sm:w-auto"
           >
             <Filter size={18} />
             Filters
@@ -164,85 +164,91 @@ const VisaList = () => {
 
       {/* Table */}
 
-      <div className="bg-white rounded-xl shadow overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-slate-100">
-            <tr>
-              <th className="p-4 text-left">Name</th>
-
-              <th className="p-4 text-left">Passport</th>
-
-              <th className="p-4 text-left">Category</th>
-
-              <th className="p-4 text-left">Source</th>
-
-              <th className="p-4 text-left">Expiry</th>
-
-              <th className="p-4 text-left">Payment</th>
-
-              <th className="p-4 text-center">Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {loading ? (
+      <div className="min-w-0 overflow-hidden rounded-xl bg-white shadow">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[850px]">
+            <thead className="bg-slate-100">
               <tr>
-                <td colSpan={7} className="py-10 text-center">
-                  Loading visas...
-                </td>
+                <th className="p-4 text-left">Name</th>
+
+                <th className="p-4 text-left">Passport</th>
+
+                <th className="p-4 text-left">Category</th>
+
+                <th className="p-4 text-left">Source</th>
+
+                <th className="p-4 text-left">Expiry</th>
+
+                <th className="p-4 text-left">Work Status</th>
+
+                <th className="p-4 text-left">Payment</th>
+
+                <th className="p-4 text-center">Action</th>
               </tr>
-            ) : visas.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="py-10 text-center">
-                  No Visa Found
-                </td>
-              </tr>
-            ) : (
-              visas.map((visa) => (
-                <tr
-                  key={visa._id}
-                  className="border-t hover:bg-slate-50 transition"
-                >
-                  <td className="p-4 font-medium">{visa.foreignerName}</td>
+            </thead>
 
-                  <td className="p-4">{visa.passportNo}</td>
-
-                  <td className="p-4">{visa.visaCategory}</td>
-
-                  <td className="p-4">{visa.source}</td>
-
-                  <td className="p-4">
-                    {visa.visaExpiryDate?.substring(0, 10)}
-                  </td>
-
-                  <td className="p-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                        visa.paymentStatus === "Paid"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
-                      }`}
-                    >
-                      {visa.paymentStatus}
-                    </span>
-                  </td>
-
-                  <td className="p-4">
-                    <div className="flex justify-center gap-2">
-                      <button
-                        onClick={() => navigate(`/visa/${visa._id}`)}
-                        className="flex items-center gap-1 bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-2 rounded-lg transition"
-                      >
-                        <Eye size={16} />
-                        View
-                      </button>
-                    </div>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={8} className="py-10 text-center">
+                    Loading visas...
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : visas.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="py-10 text-center">
+                    No Visa Found
+                  </td>
+                </tr>
+              ) : (
+                visas.map((visa) => (
+                  <tr
+                    key={visa._id}
+                    className="border-t hover:bg-slate-50 transition"
+                  >
+                    <td className="p-4 font-medium">{visa.foreignerName}</td>
+
+                    <td className="p-4">{visa.passportNo}</td>
+
+                    <td className="p-4">{visa.visaCategory}</td>
+
+                    <td className="p-4">{visa.source}</td>
+
+                    <td className="p-4">
+                      {visa.visaExpiryDate?.substring(0, 10)}
+                    </td>
+
+                    <td className="p-4">{visa.workStatus || "-"}</td>
+
+                    <td className="p-4">
+                      <span
+                        className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                          visa.paymentStatus === "Paid"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {visa.paymentStatus}
+                      </span>
+                    </td>
+
+                    <td className="p-4">
+                      <div className="flex justify-center gap-2">
+                        <button
+                          onClick={() => navigate(`/visa/${visa._id}`)}
+                          className="flex items-center gap-1 bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-2 rounded-lg transition"
+                        >
+                          <Eye size={16} />
+                          View
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <Pagination

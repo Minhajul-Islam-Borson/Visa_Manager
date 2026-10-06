@@ -1,21 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import {
-  ArrowLeft,
-  Pencil,
-  Download,
-  Save,
-  X,
-} from "lucide-react";
+import { ArrowLeft, Pencil, Download, Save, X } from "lucide-react";
 
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-import {
-  getVisaById,
-  updateVisa,
-} from "../../services/visaApi";
+import { getVisaById, updateVisa } from "../../services/visaApi";
+import DateField from "../../components/common/DateField";
+import { formatIsoDate } from "../../components/common/dateUtils.ts";
 
 const VisaDetails = () => {
   const { id } = useParams();
@@ -25,6 +18,8 @@ const VisaDetails = () => {
   const [loading, setLoading] = useState(true);
 
   const [editMode, setEditMode] = useState(false);
+
+  const [openDateField, setOpenDateField] = useState<string | null>(null);
 
   const [visa, setVisa] = useState<any>(null);
 
@@ -46,10 +41,8 @@ const VisaDetails = () => {
 
   const handleChange = (
     e: React.ChangeEvent<
-      HTMLInputElement |
-      HTMLSelectElement |
-      HTMLTextAreaElement
-    >
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
   ) => {
     setVisa({
       ...visa,
@@ -80,11 +73,7 @@ const VisaDetails = () => {
     doc.text("Visa Details", 14, 20);
 
     doc.setFontSize(11);
-    doc.text(
-      `Generated : ${new Date().toLocaleString()}`,
-      14,
-      28
-    );
+    doc.text(`Generated : ${new Date().toLocaleString()}`, 14, 28);
 
     autoTable(doc, {
       startY: 38,
@@ -95,22 +84,11 @@ const VisaDetails = () => {
         ["Source", visa.source || "-"],
         ["Visa Category", visa.visaCategory || "-"],
         ["Duration", visa.duration || "-"],
-        [
-          "Receive Date",
-          visa.receiveDate?.substring(0, 10) || "-",
-        ],
-        [
-          "File Submit Date",
-          visa.fileSubmitDate?.substring(0, 10) || "-",
-        ],
-        [
-          "Expiry Date",
-          visa.visaExpiryDate?.substring(0, 10) || "-",
-        ],
-        [
-          "Delivery Date",
-          visa.deliveryDate?.substring(0, 10) || "-",
-        ],
+        ["Work Status", visa.workStatus || "-"],
+        ["Receive Date", formatIsoDate(visa.receiveDate) || "-"],
+        ["File Submit Date", formatIsoDate(visa.fileSubmitDate) || "-"],
+        ["Expiry Date", formatIsoDate(visa.visaExpiryDate) || "-"],
+        ["Delivery Date", formatIsoDate(visa.deliveryDate) || "-"],
         ["Payment Status", visa.paymentStatus || "-"],
         ["Remark", visa.remark || "-"],
       ],
@@ -124,54 +102,39 @@ const VisaDetails = () => {
   };
 
   if (loading) {
-    return (
-      <div className="text-center py-24 text-lg">
-        Loading...
-      </div>
-    );
+    return <div className="text-center py-24 text-lg">Loading...</div>;
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-10 py-8 space-y-8">
-
+    <div className="mx-auto max-w-7xl space-y-6 px-0 py-2 sm:space-y-8 sm:px-2 sm:py-6 lg:px-4">
       {/* Header */}
 
-      <div className="bg-white rounded-2xl shadow-lg p-6 flex justify-between items-center">
-
+      <div className="flex flex-col items-stretch justify-between gap-4 rounded-2xl bg-white p-4 shadow-lg sm:flex-row sm:items-center sm:p-6">
         <div>
-
-          <h1 className="text-3xl font-bold text-slate-800">
+          <h1 className="text-2xl font-bold text-slate-800 sm:text-3xl">
             Visa Details
           </h1>
 
-          <p className="text-gray-500 mt-1">
-            Complete visa information
-          </p>
-
+          <p className="text-gray-500 mt-1">Complete visa information</p>
         </div>
 
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 border px-5 py-2 rounded-lg hover:bg-gray-100"
+          className="flex w-full items-center justify-center gap-2 rounded-lg border px-5 py-2 hover:bg-gray-100 sm:w-auto"
         >
           <ArrowLeft size={18} />
           Back
         </button>
-
       </div>
 
       {/* Details Card */}
 
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-
+      <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-lg sm:p-8">
         <div className="grid md:grid-cols-2 gap-6">
-
           {/* Foreigner Name */}
-
           <div>
-
             <label className="font-semibold">
-              Foreigner Name
+              Foreigner Name{editMode && " *"}
             </label>
 
             {editMode ? (
@@ -179,22 +142,17 @@ const VisaDetails = () => {
                 name="foreignerName"
                 value={visa.foreignerName}
                 onChange={handleChange}
+                required
                 className="border rounded-lg p-2 mt-2 w-full"
               />
             ) : (
-              <p className="mt-2">
-                {visa.foreignerName}
-              </p>
+              <p className="mt-2 break-words">{visa.foreignerName}</p>
             )}
-
           </div>
-
           {/* Passport */}
-
           <div>
-
             <label className="font-semibold">
-              Passport No
+              Passport Number{editMode && " *"}
             </label>
 
             {editMode ? (
@@ -202,45 +160,33 @@ const VisaDetails = () => {
                 name="passportNo"
                 value={visa.passportNo}
                 onChange={handleChange}
+                required
                 className="border rounded-lg p-2 mt-2 w-full"
               />
             ) : (
-              <p className="mt-2">
-                {visa.passportNo}
-              </p>
+              <p className="mt-2 break-words">{visa.passportNo}</p>
             )}
-
           </div>
-
           {/* Source */}
-
           <div>
-
-            <label className="font-semibold">
-              Source
-            </label>
+            <label className="font-semibold">Source{editMode && " *"}</label>
 
             {editMode ? (
               <input
                 name="source"
                 value={visa.source}
                 onChange={handleChange}
+                required
                 className="border rounded-lg p-2 mt-2 w-full"
               />
             ) : (
-              <p className="mt-2">
-                {visa.source}
-              </p>
+              <p className="mt-2 break-words">{visa.source}</p>
             )}
-
           </div>
-
           {/* Visa Category */}
-
           <div>
-
             <label className="font-semibold">
-              Visa Category
+              Visa Category{editMode && " *"}
             </label>
 
             {editMode ? (
@@ -248,172 +194,160 @@ const VisaDetails = () => {
                 name="visaCategory"
                 value={visa.visaCategory}
                 onChange={handleChange}
+                required
                 className="border rounded-lg p-2 mt-2 w-full"
               />
             ) : (
-              <p className="mt-2">
-                {visa.visaCategory}
-              </p>
+              <p className="mt-2 break-words">{visa.visaCategory}</p>
             )}
-
           </div>
-
           {/* Duration */}
-
           <div>
-
-            <label className="font-semibold">
-              Duration
-            </label>
+            <label className="font-semibold">Duration{editMode && " *"}</label>
 
             {editMode ? (
               <input
                 name="duration"
                 value={visa.duration}
                 onChange={handleChange}
+                required
                 className="border rounded-lg p-2 mt-2 w-full"
               />
             ) : (
-              <p className="mt-2">
-                {visa.duration}
-              </p>
+              <p className="mt-2 break-words">{visa.duration}</p>
             )}
-
           </div>
-
-          {/* Payment */}
-
+          {/* Work Status */}
           <div>
-
             <label className="font-semibold">
-              Payment Status
+              Work Status{editMode && " *"}
             </label>
+
+            {editMode ? (
+              <input
+                name="workStatus"
+                value={visa.workStatus || ""}
+                onChange={handleChange}
+                required
+                className="border rounded-lg p-2 mt-2 w-full"
+              />
+            ) : (
+              <p className="mt-2 break-words">{visa.workStatus || "-"}</p>
+            )}
+          </div>
+          {/* Payment */}
+          <div>
+            <label className="font-semibold">Payment Status</label>
 
             {editMode ? (
               <select
                 name="paymentStatus"
-                value={visa.paymentStatus}
+                value={visa.paymentStatus || ""}
                 onChange={handleChange}
                 className="border rounded-lg p-2 mt-2 w-full"
               >
-                <option value="Paid">
-                  Paid
-                </option>
+                <option value="">Not set</option>
+                <option value="Paid">Paid</option>
 
-                <option value="Pending">
-                  Pending
-                </option>
-
+                <option value="Pending">Pending</option>
               </select>
             ) : (
-              <p className="mt-2">
-                {visa.paymentStatus}
-              </p>
+              <p className="mt-2 break-words">{visa.paymentStatus || "-"}</p>
             )}
-
-          </div>          {/* Receive Date */}
-
+          </div>{" "}
+          {/* Receive Date */}
           <div>
-
             <label className="font-semibold">
-              Receive Date
+              Receive Date{editMode && " *"}
             </label>
 
             {editMode ? (
-              <input
-                type="date"
+              <DateField
                 name="receiveDate"
-                value={visa.receiveDate?.substring(0, 10)}
-                onChange={handleChange}
-                className="border rounded-lg p-2 mt-2 w-full"
+                value={visa.receiveDate?.substring(0, 10) || ""}
+                onChange={(value) => setVisa({ ...visa, receiveDate: value })}
+                required
+                open={openDateField === "receiveDate"}
+                onOpenChange={(open) =>
+                  setOpenDateField(open ? "receiveDate" : null)
+                }
               />
             ) : (
-              <p className="mt-2">
-                {visa.receiveDate?.substring(0, 10)}
+              <p className="mt-2 break-words">
+                {formatIsoDate(visa.receiveDate) || "-"}
               </p>
             )}
-
           </div>
-
           {/* File Submit Date */}
-
           <div>
-
-            <label className="font-semibold">
-              File Submit Date
-            </label>
+            <label className="font-semibold">File Submit Date</label>
 
             {editMode ? (
-              <input
-                type="date"
+              <DateField
                 name="fileSubmitDate"
-                value={visa.fileSubmitDate?.substring(0, 10)}
-                onChange={handleChange}
-                className="border rounded-lg p-2 mt-2 w-full"
+                value={visa.fileSubmitDate?.substring(0, 10) || ""}
+                onChange={(value) =>
+                  setVisa({ ...visa, fileSubmitDate: value || null })
+                }
+                open={openDateField === "fileSubmitDate"}
+                onOpenChange={(open) =>
+                  setOpenDateField(open ? "fileSubmitDate" : null)
+                }
               />
             ) : (
-              <p className="mt-2">
-                {visa.fileSubmitDate?.substring(0, 10)}
+              <p className="mt-2 break-words">
+                {formatIsoDate(visa.fileSubmitDate) || "-"}
               </p>
             )}
-
           </div>
-
           {/* Visa Expiry */}
-
           <div>
-
             <label className="font-semibold">
-              Visa Expiry Date
+              Expiry Date{editMode && " *"}
             </label>
 
             {editMode ? (
-              <input
-                type="date"
+              <DateField
                 name="visaExpiryDate"
-                value={visa.visaExpiryDate?.substring(0, 10)}
-                onChange={handleChange}
-                className="border rounded-lg p-2 mt-2 w-full"
+                value={visa.visaExpiryDate?.substring(0, 10) || ""}
+                onChange={(value) =>
+                  setVisa({ ...visa, visaExpiryDate: value })
+                }
+                required
+                open={openDateField === "visaExpiryDate"}
+                onOpenChange={(open) =>
+                  setOpenDateField(open ? "visaExpiryDate" : null)
+                }
               />
             ) : (
-              <p className="mt-2">
-                {visa.visaExpiryDate?.substring(0, 10)}
+              <p className="mt-2 break-words">
+                {formatIsoDate(visa.visaExpiryDate) || "-"}
               </p>
             )}
-
           </div>
-
           {/* Delivery Date */}
-
           <div>
-
-            <label className="font-semibold">
-              Delivery Date
-            </label>
+            <label className="font-semibold">Delivery Date</label>
 
             {editMode ? (
-              <input
-                type="date"
+              <DateField
                 name="deliveryDate"
-                value={visa.deliveryDate?.substring(0, 10)}
-                onChange={handleChange}
-                className="border rounded-lg p-2 mt-2 w-full"
+                value={visa.deliveryDate?.substring(0, 10) || ""}
+                onChange={(value) =>
+                  setVisa({ ...visa, deliveryDate: value || null })
+                }
+                open={openDateField === "deliveryDate"}
+                onOpenChange={(open) =>
+                  setOpenDateField(open ? "deliveryDate" : null)
+                }
               />
             ) : (
-              <p className="mt-2">
-                {visa.deliveryDate?.substring(0, 10)}
-              </p>
+              <p className="mt-2">{formatIsoDate(visa.deliveryDate) || "-"}</p>
             )}
-
           </div>
-
           {/* Remark */}
-
           <div className="md:col-span-2">
-
-            <label className="font-semibold">
-              Remark
-            </label>
+            <label className="font-semibold">Remark</label>
 
             {editMode ? (
               <textarea
@@ -424,72 +358,58 @@ const VisaDetails = () => {
                 className="border rounded-lg p-3 mt-2 w-full"
               />
             ) : (
-              <p className="mt-2 whitespace-pre-wrap">
+              <p className="mt-2 whitespace-pre-wrap break-words">
                 {visa.remark || "No Remark"}
               </p>
             )}
-
           </div>
-
         </div>
-
       </div>
 
       {/* Action Bar */}
 
-      <div className="sticky bottom-5 bg-white rounded-2xl shadow-xl border border-gray-200 p-5 flex justify-end gap-4">
-
+      <div className="sticky bottom-3 flex flex-col justify-end gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-xl sm:bottom-5 sm:flex-row sm:gap-4 sm:p-5">
         {!editMode ? (
           <>
-
             <button
               onClick={() => setEditMode(true)}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 transition text-white px-6 py-3 rounded-xl"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-white transition hover:bg-blue-700 sm:w-auto sm:px-6"
             >
               <Pencil size={18} />
-
               Edit
             </button>
 
             <button
               onClick={downloadPDF}
-              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 transition text-white px-6 py-3 rounded-xl"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-5 py-3 text-white transition hover:bg-green-700 sm:w-auto sm:px-6"
             >
               <Download size={18} />
-
               Download PDF
             </button>
-
           </>
         ) : (
           <>
-
             <button
               onClick={() => {
                 setEditMode(false);
                 loadVisa();
               }}
-              className="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 transition px-6 py-3 rounded-xl"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gray-200 px-5 py-3 transition hover:bg-gray-300 sm:w-auto sm:px-6"
             >
               <X size={18} />
-
               Cancel
             </button>
 
             <button
               onClick={saveChanges}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 transition text-white px-6 py-3 rounded-xl"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-white transition hover:bg-blue-700 sm:w-auto sm:px-6"
             >
               <Save size={18} />
-
               Save Changes
             </button>
-
           </>
         )}
-
       </div>
-
     </div>
   );
 };

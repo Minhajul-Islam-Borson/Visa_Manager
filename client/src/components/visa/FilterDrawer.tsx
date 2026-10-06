@@ -1,7 +1,4 @@
-import {
-  X,
-  Filter,
-} from "lucide-react";
+import { X, Filter } from "lucide-react";
 
 import type { VisaQuery } from "../../types/visa";
 
@@ -12,9 +9,7 @@ interface Props {
   onClose: () => void;
 
   onChange: (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => void;
 
   onApply: () => void;
@@ -33,39 +28,27 @@ const FilterDrawer = ({
   return (
     <>
       {open && (
-        <div
-          className="fixed inset-0 bg-black/30 z-40"
-          onClick={onClose}
-        />
+        <div className="fixed inset-0 bg-black/30 z-40" onClick={onClose} />
       )}
 
       <div
-        className={`fixed top-0 right-0 h-full w-96 bg-white shadow-2xl z-50 transition-transform duration-300 ${
-          open
-            ? "translate-x-0"
-            : "translate-x-full"
+        className={`fixed right-0 top-0 z-50 h-dvh w-full max-w-96 overflow-y-auto bg-white shadow-2xl transition-transform duration-300 ${
+          open ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="flex justify-between items-center border-b p-5">
-
           <div className="flex items-center gap-2">
-
             <Filter size={20} />
 
-            <h2 className="text-xl font-bold">
-              Filters
-            </h2>
-
+            <h2 className="text-xl font-bold">Filters</h2>
           </div>
 
           <button onClick={onClose}>
             <X />
           </button>
-
         </div>
 
         <div className="p-5 space-y-5">
-
           <select
             name="paymentStatus"
             value={filters.paymentStatus}
@@ -94,10 +77,7 @@ const FilterDrawer = ({
           />
 
           <div>
-
-            <label>
-              Receive From
-            </label>
+            <label>Receive From</label>
 
             <input
               type="date"
@@ -106,14 +86,10 @@ const FilterDrawer = ({
               onChange={onChange}
               className="w-full border rounded-lg p-3 mt-2"
             />
-
           </div>
 
           <div>
-
-            <label>
-              Receive To
-            </label>
+            <label>Receive To</label>
 
             <input
               type="date"
@@ -122,11 +98,9 @@ const FilterDrawer = ({
               onChange={onChange}
               className="w-full border rounded-lg p-3 mt-2"
             />
-
           </div>
 
           <div className="flex gap-3 pt-4">
-
             <button
               onClick={onApply}
               className="flex-1 bg-blue-600 text-white rounded-lg py-3"
@@ -140,11 +114,8 @@ const FilterDrawer = ({
             >
               Reset
             </button>
-
           </div>
-
         </div>
-
       </div>
     </>
   );

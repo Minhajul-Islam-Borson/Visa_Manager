@@ -4,7 +4,7 @@ import Visa from "../models/Visa";
 
 export const getDashboardSummary = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     // Total Visa
@@ -19,7 +19,7 @@ export const getDashboardSummary = async (
       .sort({ createdAt: -1 })
       .limit(5)
       .select(
-        "foreignerName passportNo visaCategory receiveDate visaExpiryDate paymentStatus"
+        "foreignerName passportNo visaCategory receiveDate visaExpiryDate paymentStatus workStatus",
       );
 
     res.status(200).json({
@@ -41,7 +41,7 @@ export const getDashboardSummary = async (
 
 export const exportExcel = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const visas = await Visa.find({
@@ -96,6 +96,11 @@ export const exportExcel = async (
         width: 15,
       },
       {
+        header: "Work Status",
+        key: "workStatus",
+        width: 24,
+      },
+      {
         header: "Remark",
         key: "remark",
         width: 30,
@@ -122,18 +127,19 @@ export const exportExcel = async (
           ? new Date(visa.deliveryDate).toLocaleDateString()
           : "",
         paymentStatus: visa.paymentStatus,
+        workStatus: visa.workStatus,
         remark: visa.remark,
       });
     });
 
     res.setHeader(
       "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     );
 
     res.setHeader(
       "Content-Disposition",
-      'attachment; filename="Visa_Report.xlsx"'
+      'attachment; filename="Visa_Report.xlsx"',
     );
 
     await workbook.xlsx.write(res);

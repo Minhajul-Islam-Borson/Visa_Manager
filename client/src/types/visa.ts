@@ -8,15 +8,16 @@ export interface Visa {
   visaCategory: string;
 
   duration: string;
+  workStatus: string;
 
   receiveDate: string;
   visaExpiryDate: string;
-  fileSubmitDate: string;
-  deliveryDate: string;
+  fileSubmitDate: string | null;
+  deliveryDate: string | null;
 
-  paymentStatus: "Paid" | "UnPaid";
+  paymentStatus: "Paid" | "Pending" | "UnPaid" | null;
 
-  remark: string;
+  remark: string | null;
 
   createdAt: string;
   updatedAt: string;

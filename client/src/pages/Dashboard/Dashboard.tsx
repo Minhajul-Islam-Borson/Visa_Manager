@@ -2,10 +2,7 @@ import { useEffect, useState } from "react";
 import { Download, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-import {
-  getDashboard,
-  exportVisaExcel,
-} from "../../services/dashboardApi";
+import { getDashboard, exportVisaExcel } from "../../services/dashboardApi";
 
 import RecentVisaTable from "../../components/dashboard/RecentVisaTable";
 
@@ -40,9 +37,7 @@ const Dashboard = () => {
     try {
       const res = await exportVisaExcel();
 
-      const url = window.URL.createObjectURL(
-        new Blob([res.data])
-      );
+      const url = window.URL.createObjectURL(new Blob([res.data]));
 
       const link = document.createElement("a");
 
@@ -63,37 +58,26 @@ const Dashboard = () => {
   };
 
   if (loading) {
-    return (
-      <div className="p-8">
-        Loading...
-      </div>
-    );
+    return <div className="p-8">Loading...</div>;
   }
 
   return (
-    <div className="p-8 space-y-8">
-
+    <div className="space-y-6 p-4 sm:space-y-8 sm:p-6 lg:p-8">
       {/* Header */}
 
-      <div className="flex justify-between items-center">
-
+      <div className="flex flex-col items-stretch justify-between gap-5 sm:flex-row sm:items-center">
         <div>
+          <h1 className="text-2xl font-bold sm:text-3xl">Dashboard</h1>
 
-          <h1 className="text-3xl font-bold">
-            Dashboard
-          </h1>
-
-          <p className="text-gray-500 mt-1">
+          <p className="mt-1 text-sm text-gray-500 sm:text-base">
             Welcome back! Manage your visa records efficiently.
           </p>
-
         </div>
 
-        <div className="flex gap-3">
-
+        <div className="flex flex-col gap-3 sm:flex-row">
           <button
             onClick={() => navigate("/visa/add")}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl shadow transition"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-white shadow transition hover:bg-blue-700 sm:w-auto"
           >
             <Plus size={18} />
             Add New Visa
@@ -101,62 +85,45 @@ const Dashboard = () => {
 
           <button
             onClick={handleDownload}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-xl shadow transition"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-5 py-3 text-white shadow transition hover:bg-green-700 sm:w-auto"
           >
             <Download size={18} />
             Download Excel
           </button>
-
         </div>
-
       </div>
 
       {/* Total Visa Card */}
 
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl shadow-lg p-8 text-white">
+      <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 p-5 text-white shadow-lg sm:p-8">
+        <p className="text-lg font-medium">Total Visa Records</p>
 
-        <p className="text-lg font-medium">
-          Total Visa Records
-        </p>
-
-        <h2 className="text-6xl font-bold mt-3">
-          {totalVisa}
-        </h2>
+        <h2 className="mt-3 text-5xl font-bold sm:text-6xl">{totalVisa}</h2>
 
         <p className="mt-3 text-blue-100">
           Total visa applications currently stored in the system.
         </p>
-
       </div>
 
       {/* Recent Visa */}
 
       <div className="bg-white rounded-2xl shadow">
-
-        <div className="flex justify-between items-center border-b px-6 py-4">
-
+        <div className="flex items-center justify-between border-b px-4 py-4 sm:px-6">
           <div>
-
-            <h2 className="text-2xl font-semibold">
+            <h2 className="text-xl font-semibold sm:text-2xl">
               Recent Visa Entries
             </h2>
 
             <p className="text-gray-500 text-sm">
               Latest visa records added to the system
             </p>
-
           </div>
-
         </div>
 
-        <div className="p-6">
-
+        <div className="p-3 sm:p-6">
           <RecentVisaTable visas={recentVisa} />
-
         </div>
-
       </div>
-
     </div>
   );
 };

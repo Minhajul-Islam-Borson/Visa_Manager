@@ -17,6 +17,7 @@ export const createVisa = async (
       source,
       visaCategory,
       duration,
+      workStatus,
       receiveDate,
       visaExpiryDate,
       fileSubmitDate,
@@ -25,10 +26,24 @@ export const createVisa = async (
       remark,
     } = req.body;
 
-    if (!foreignerName || !passportNo) {
+    if (
+      ![
+        foreignerName,
+        passportNo,
+        source,
+        visaCategory,
+        duration,
+        workStatus,
+      ].every(
+        (value) => typeof value === "string" && value.trim().length > 0,
+      ) ||
+      !receiveDate ||
+      !visaExpiryDate
+    ) {
       res.status(400).json({
         success: false,
-        message: "Foreigner Name and Passport No are required.",
+        message:
+          "Name, Passport Number, Source, Visa Category, Duration, Work Status, Receive Date, and Expiry Date are required.",
       });
       return;
     }
@@ -52,12 +67,13 @@ export const createVisa = async (
       source,
       visaCategory,
       duration,
+      workStatus,
       receiveDate,
       visaExpiryDate,
-      fileSubmitDate,
-      deliveryDate,
-      paymentStatus,
-      remark,
+      fileSubmitDate: fileSubmitDate || null,
+      deliveryDate: deliveryDate || null,
+      paymentStatus: paymentStatus || null,
+      remark: remark || null,
       createdBy: req.user.id,
     });
     try {
@@ -67,12 +83,13 @@ export const createVisa = async (
         source,
         visaCategory,
         duration,
+        workStatus,
         receiveDate,
         visaExpiryDate,
-        fileSubmitDate,
-        deliveryDate,
-        paymentStatus,
-        remark,
+        fileSubmitDate: fileSubmitDate || "",
+        deliveryDate: deliveryDate || "",
+        paymentStatus: paymentStatus || "",
+        remark: remark || "",
       });
     } catch (error) {
       console.error("Error adding visa to Google Sheet:", error);
@@ -299,6 +316,7 @@ export const updateVisa = async (
       source,
       visaCategory,
       duration,
+      workStatus,
       receiveDate,
       visaExpiryDate,
       fileSubmitDate,
@@ -331,12 +349,14 @@ export const updateVisa = async (
     if (source !== undefined) visa.source = source;
     if (visaCategory !== undefined) visa.visaCategory = visaCategory;
     if (duration !== undefined) visa.duration = duration;
+    if (workStatus !== undefined) visa.workStatus = workStatus;
     if (receiveDate !== undefined) visa.receiveDate = receiveDate;
     if (visaExpiryDate !== undefined) visa.visaExpiryDate = visaExpiryDate;
-    if (fileSubmitDate !== undefined) visa.fileSubmitDate = fileSubmitDate;
-    if (deliveryDate !== undefined) visa.deliveryDate = deliveryDate;
-    if (paymentStatus !== undefined) visa.paymentStatus = paymentStatus;
-    if (remark !== undefined) visa.remark = remark;
+    if (fileSubmitDate !== undefined)
+      visa.fileSubmitDate = fileSubmitDate || null;
+    if (deliveryDate !== undefined) visa.deliveryDate = deliveryDate || null;
+    if (paymentStatus !== undefined) visa.paymentStatus = paymentStatus || null;
+    if (remark !== undefined) visa.remark = remark || null;
 
     visa.updatedBy = req.user.id;
 
