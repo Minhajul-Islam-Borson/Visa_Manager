@@ -1,13 +1,13 @@
 import axios from "axios";
 
-// const api = axios.create({
-//   baseURL: "https://visa-manager-server.onrender.com/api",
-//   withCredentials: false,
-// });
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "https://visa-manager-server.onrender.com/api",
   withCredentials: false,
 });
+// const api = axios.create({
+//   baseURL: "http://localhost:5000/api",
+//   withCredentials: false,
+// });
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");

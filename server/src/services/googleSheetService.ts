@@ -95,3 +95,58 @@ export const addVisaToSheet = async (data: any) => {
     throw error;
   }
 };
+
+export const updateVisaInSheet = async (
+  previousPassportNo: string,
+  data: any,
+) => {
+  try {
+    const spreadsheetId = process.env.SPREADSHEET_ID;
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: "Sheet1!A:L",
+    });
+    const rows = response.data.values ?? [];
+    const rowIndex = rows.findIndex(
+      (row, index) =>
+        index > 0 && String(row[1] ?? "").trim() === previousPassportNo.trim(),
+    );
+
+    if (rowIndex === -1) {
+      throw new Error(
+        `Visa with passport number "${previousPassportNo}" was not found in Google Sheet.`,
+      );
+    }
+
+    const formatDate = (value: Date | string | null | undefined) =>
+      value ? new Date(value).toISOString().slice(0, 10) : "";
+
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: `Sheet1!A${rowIndex + 1}:L${rowIndex + 1}`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: {
+        values: [
+          [
+            data.foreignerName,
+            data.passportNo,
+            data.source,
+            data.visaCategory,
+            data.duration,
+            data.workStatus,
+            formatDate(data.receiveDate),
+            formatDate(data.visaExpiryDate),
+            formatDate(data.fileSubmitDate),
+            formatDate(data.deliveryDate),
+            data.paymentStatus ?? "",
+            data.remark ?? "",
+          ],
+        ],
+      },
+    });
+  } catch (error) {
+    console.log("Google Sheet Update Error:", error);
+
+    throw error;
+  }
+};

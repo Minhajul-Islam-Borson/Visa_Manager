@@ -66,7 +66,7 @@ const createVisa = async (req, res) => {
                 visaExpiryDate,
                 fileSubmitDate: fileSubmitDate || "",
                 deliveryDate: deliveryDate || "",
-                paymentStatus: paymentStatus || "",
+                paymentStatus: visa.paymentStatus || "",
                 remark: remark || "",
             });
         }
@@ -126,7 +126,7 @@ const getAllVisa = async (req, res) => {
         }
         // ================= FILTERS =================
         if (paymentStatus) {
-            filter.paymentStatus = paymentStatus;
+            filter.paymentStatus = paymentStatus === "null" ? null : paymentStatus;
         }
         if (visaCategory) {
             filter.visaCategory = visaCategory;
@@ -252,6 +252,7 @@ const updateVisa = async (req, res) => {
             }
         }
         // ================= END NEW =================
+        const previousPassportNo = visa.passportNo;
         if (foreignerName !== undefined)
             visa.foreignerName = foreignerName;
         if (passportNo !== undefined)
@@ -278,6 +279,12 @@ const updateVisa = async (req, res) => {
             visa.remark = remark || null;
         visa.updatedBy = req.user.id;
         await visa.save();
+        try {
+            await (0, googleSheetService_1.updateVisaInSheet)(previousPassportNo, visa);
+        }
+        catch (error) {
+            console.error("Error updating visa in Google Sheet:", error);
+        }
         res.status(200).json({
             success: true,
             message: "Visa updated successfully.",

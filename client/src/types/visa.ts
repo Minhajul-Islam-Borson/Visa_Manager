@@ -15,7 +15,7 @@ export interface Visa {
   fileSubmitDate: string | null;
   deliveryDate: string | null;
 
-  paymentStatus: "Paid" | "Pending" | "UnPaid" | null;
+  paymentStatus: "Paid" | "Pending" | null;
 
   remark: string | null;
 

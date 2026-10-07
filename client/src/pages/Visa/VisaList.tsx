@@ -222,13 +222,13 @@ const VisaList = () => {
 
                     <td className="p-4">
                       <span
-                        className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                        className={`whitespace-nowrap px-3 py-1 rounded-full text-sm font-semibold ${
                           visa.paymentStatus === "Paid"
                             ? "bg-green-100 text-green-700"
                             : "bg-red-100 text-red-700"
                         }`}
                       >
-                        {visa.paymentStatus}
+                        {visa.paymentStatus || "Not set"}
                       </span>
                     </td>
 

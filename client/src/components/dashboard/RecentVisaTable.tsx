@@ -52,7 +52,7 @@ const RecentVisaTable = ({ visas }: Props) => {
                         : "bg-red-100 text-red-700"
                     }`}
                   >
-                    {visa.paymentStatus}
+                    {visa.paymentStatus || "Not set"}
                   </span>
                 </td>
               </tr>

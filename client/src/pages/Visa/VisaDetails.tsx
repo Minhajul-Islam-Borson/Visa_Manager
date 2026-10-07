@@ -89,7 +89,7 @@ const VisaDetails = () => {
         ["File Submit Date", formatIsoDate(visa.fileSubmitDate) || "-"],
         ["Expiry Date", formatIsoDate(visa.visaExpiryDate) || "-"],
         ["Delivery Date", formatIsoDate(visa.deliveryDate) || "-"],
-        ["Payment Status", visa.paymentStatus || "-"],
+        ["Payment Status", visa.paymentStatus || "Not set"],
         ["Remark", visa.remark || "-"],
       ],
       theme: "grid",
@@ -252,7 +252,9 @@ const VisaDetails = () => {
                 <option value="Pending">Pending</option>
               </select>
             ) : (
-              <p className="mt-2 break-words">{visa.paymentStatus || "-"}</p>
+              <p className="mt-2 break-words">
+                {visa.paymentStatus || "Not set"}
+              </p>
             )}
           </div>{" "}
           {/* Receive Date */}

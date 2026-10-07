@@ -1,7 +1,10 @@
 import { Request, Response } from "express";
 import Visa from "../models/Visa";
 import { AuthRequest } from "../middleware/authMiddleware";
-import { addVisaToSheet } from "../services/googleSheetService";
+import {
+  addVisaToSheet,
+  updateVisaInSheet,
+} from "../services/googleSheetService";
 
 /**
  * Create Visa
@@ -88,7 +91,7 @@ export const createVisa = async (
         visaExpiryDate,
         fileSubmitDate: fileSubmitDate || "",
         deliveryDate: deliveryDate || "",
-        paymentStatus: paymentStatus || "",
+        paymentStatus: visa.paymentStatus || "",
         remark: remark || "",
       });
     } catch (error) {
@@ -173,7 +176,7 @@ export const getAllVisa = async (
     // ================= FILTERS =================
 
     if (paymentStatus) {
-      filter.paymentStatus = paymentStatus;
+      filter.paymentStatus = paymentStatus === "null" ? null : paymentStatus;
     }
 
     if (visaCategory) {
@@ -344,6 +347,8 @@ export const updateVisa = async (
     }
     // ================= END NEW =================
 
+    const previousPassportNo = visa.passportNo;
+
     if (foreignerName !== undefined) visa.foreignerName = foreignerName;
     if (passportNo !== undefined) visa.passportNo = passportNo;
     if (source !== undefined) visa.source = source;
@@ -361,6 +366,12 @@ export const updateVisa = async (
     visa.updatedBy = req.user.id;
 
     await visa.save();
+
+    try {
+      await updateVisaInSheet(previousPassportNo, visa);
+    } catch (error) {
+      console.error("Error updating visa in Google Sheet:", error);
+    }
 
     res.status(200).json({
       success: true,
