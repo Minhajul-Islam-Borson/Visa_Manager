@@ -7,6 +7,7 @@ import { getAllVisa } from "../../services/visaApi";
 import type { Visa, VisaQuery } from "../../types/visa";
 
 import Pagination from "../../components/common/Pagination";
+import { formatIsoDate } from "../../components/common/dateUtils";
 import FilterDrawer from "../../components/visa/FilterDrawer";
 
 const VisaList = () => {
@@ -177,7 +178,7 @@ const VisaList = () => {
 
                 <th className="p-4 text-left">Source</th>
 
-                <th className="p-4 text-left">Expiry</th>
+                <th className="p-4 text-left">Expiry Date</th>
 
                 <th className="p-4 text-left">Work Status</th>
 
@@ -215,7 +216,7 @@ const VisaList = () => {
                     <td className="p-4">{visa.source}</td>
 
                     <td className="p-4">
-                      {visa.visaExpiryDate?.substring(0, 10)}
+                      {formatIsoDate(visa.visaExpiryDate)}
                     </td>
 
                     <td className="p-4">{visa.workStatus || "-"}</td>

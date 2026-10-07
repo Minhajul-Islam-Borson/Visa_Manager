@@ -1,3 +1,5 @@
+import { formatIsoDate } from "../common/dateUtils";
+
 interface Props {
   visas: any[];
 }
@@ -38,9 +40,9 @@ const RecentVisaTable = ({ visas }: Props) => {
 
                 <td className="p-4">{visa.visaCategory}</td>
 
-                <td className="p-4">{visa.receiveDate?.substring(0, 10)}</td>
+                <td className="p-4">{formatIsoDate(visa.receiveDate)}</td>
 
-                <td className="p-4">{visa.visaExpiryDate?.substring(0, 10)}</td>
+                <td className="p-4">{formatIsoDate(visa.visaExpiryDate)}</td>
 
                 <td className="p-4">{visa.workStatus || "-"}</td>
 
